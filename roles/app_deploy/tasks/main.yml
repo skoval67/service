@@ -1,0 +1,22 @@
+---
+# tasks file for app_deploy
+  - name: Pull an image
+    docker_image:
+      name: "{{ app_docker_image }}"
+      source: pull
+
+  - name: Start container
+    docker_container:
+      name: apptest
+      image: "{{ app_docker_image }}"
+      ports: "80:8080"
+      state: started
+
+  - name: Copy file with tests
+    copy:
+      src: test.py
+      dest: /tmp/
+
+  - name: Start test
+    command: pytest -v /tmp/test.py
+                                      
