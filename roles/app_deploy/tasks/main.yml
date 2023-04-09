@@ -1,22 +1,34 @@
 ---
 # tasks file for app_deploy
+  - name: Get a list of all running containers
+    community.docker.docker_host_info:
+      containers: True
+    register: docker_info
+
+  - name: Stop all running containers
+    community.docker.docker_container:
+      name: '{{ item.Names[0] | regex_replace("^/", "") }}'
+      state: stopped
+    loop: '{{ docker_info.containers }}'
+
   - name: Pull an image
-    docker_image:
+    community.docker.docker_image:
       name: "{{ app_docker_image }}"
       source: pull
 
   - name: Start container
-    docker_container:
+    community.docker.docker_container:
       name: apptest
       image: "{{ app_docker_image }}"
       ports: "80:8080"
       state: started
 
   - name: Copy file with tests
-    copy:
+    ansible.builtin.copy:
       src: test.py
       dest: /tmp/
+      mode: "0755"
 
   - name: Start test
-    command: pytest -v /tmp/test.py
-                                      
+    ansible.builtin.command: pytest -v /tmp/test.py
+    changed_when: false

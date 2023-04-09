@@ -1,5 +1,6 @@
 ---
 - hosts: app_servers
+  name: Deploy instahelper application
   become: yes
   roles:
     - role: app_deploy
