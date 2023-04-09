@@ -1,0 +1,13 @@
+[Unit]
+Description=Skillbox Web Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStart=/usr/bin/docker run -p80:8080 {{ app_docker_image }}
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target

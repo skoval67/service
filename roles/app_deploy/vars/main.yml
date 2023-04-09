@@ -1,3 +1,2 @@
 ---
 # vars file for app_deploy
-app_docker_image: svkoval67/hubs:latest

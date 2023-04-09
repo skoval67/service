@@ -1,34 +1,41 @@
 ---
 # tasks file for app_deploy
-  - name: Get a list of all running containers
-    community.docker.docker_host_info:
-      containers: True
-    register: docker_info
+- name: Get list of services
+  service_facts:
 
-  - name: Stop all running containers
-    community.docker.docker_container:
-      name: '{{ item.Names[0] | regex_replace("^/", "") }}'
-      state: stopped
-    loop: '{{ docker_info.containers }}'
+- name: Stop service, if exists
+  ansible.builtin.systemd:
+    name: instahelper.service
+    state: stopped
+  when: "'instahelper.service' in services"
 
-  - name: Pull an image
-    community.docker.docker_image:
-      name: "{{ app_docker_image }}"
-      source: pull
+- name: Create instahelper systemd service file
+  template:
+    src: templates/service.j2
+    dest: /lib/systemd/system/instahelper.service
 
-  - name: Start container
-    community.docker.docker_container:
-      name: apptest
-      image: "{{ app_docker_image }}"
-      ports: "80:8080"
-      state: started
+- name: Pull an image
+  community.docker.docker_image:
+    name: "{{ app_docker_image }}"
+    source: pull
 
-  - name: Copy file with tests
-    ansible.builtin.copy:
-      src: test.py
-      dest: /tmp/
-      mode: "0755"
+- name: Make sure a service unit is running
+  ansible.builtin.systemd:
+    name: instahelper.service
+    daemon_reload: true
+    state: started
 
-  - name: Start test
-    ansible.builtin.command: pytest -v /tmp/test.py
-    changed_when: false
+- name: Enable service
+  ansible.builtin.systemd:
+    name: instahelper.service
+    enabled: true
+
+- name: Copy file with tests
+  ansible.builtin.copy:
+    src: test.py
+    dest: /tmp/
+    mode: "0755"
+
+- name: Start test
+  ansible.builtin.command: pytest -v /tmp/test.py
+  changed_when: false
