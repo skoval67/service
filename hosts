@@ -1,6 +1,6 @@
 [app_servers]
-app_1 ansible_host=51.250.28.172 ansible_user=ubuntu ansible_ssh_private_key=~/.ssh/id_ed25519
-app_2 ansible_host=51.250.64.226 ansible_user=ubuntu ansible_ssh_private_key=~/.ssh/id_ed25519
+app_0 ansible_host=158.160.28.176 ansible_user=ubuntu ansible_ssh_private_key=~/.ssh/id_ed25519
+app_1 ansible_host=51.250.77.39 ansible_user=ubuntu ansible_ssh_private_key=~/.ssh/id_ed25519
 
 [app_servers:vars]
 app_docker_image = svkoval67/hubs:latest
